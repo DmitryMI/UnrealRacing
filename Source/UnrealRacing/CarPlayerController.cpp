@@ -55,10 +55,15 @@ void ACarPlayerController::Tick(float deltaTime)
 	DeprojectScreenPositionToWorld(mouseX, mouseY, worldPosition, worldDirection);
 
 	worldDirection *= 10000;
+
+	DrawDebugLine(GetWorld(), worldPosition, worldPosition + worldDirection, FColor::Red);
+
 	FPlane plane = FPlane(FVector(0, 0, 0), FVector(0, 1, 0));
 	float intersectionT;
 	FVector intersection;
-	UKismetMathLibrary::LinePlaneIntersection(worldPosition, worldDirection, plane, intersectionT, intersection);
+	UKismetMathLibrary::LinePlaneIntersection(worldPosition, worldPosition + worldDirection, plane, intersectionT, intersection);
+
+	//DrawDebugLine(GetWorld(), worldPosition, intersection, FColor::Green);
 
 	DrawDebugBox(GetWorld(), intersection, FVector(50, 50, 50), FColor::Green);
 }

@@ -2,6 +2,8 @@
 
 
 #include "CarPlayerController.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "DrawDebugHelpers.h"
 
 void ACarPlayerController::BindInput()
 {
@@ -11,6 +13,7 @@ void ACarPlayerController::BindInput()
 
 void ACarPlayerController::BeginPlay()
 {
+	Super::BeginPlay();
 	if (InputComponent != nullptr)
 	{
 		BindInput();
@@ -37,4 +40,25 @@ void ACarPlayerController::OnUnPossess()
 {
 	Super::OnUnPossess();
 	posessedCar = nullptr;
+}
+
+void ACarPlayerController::Tick(float deltaTime)
+{
+	Super::Tick(deltaTime);
+
+	float mouseX;
+	float mouseY;
+	bool mouseValid = GetMousePosition(mouseX, mouseY);
+
+	FVector worldPosition;
+	FVector worldDirection;
+	DeprojectScreenPositionToWorld(mouseX, mouseY, worldPosition, worldDirection);
+
+	worldDirection *= 10000;
+	FPlane plane = FPlane(FVector(0, 0, 0), FVector(0, 1, 0));
+	float intersectionT;
+	FVector intersection;
+	UKismetMathLibrary::LinePlaneIntersection(worldPosition, worldDirection, plane, intersectionT, intersection);
+
+	DrawDebugBox(GetWorld(), intersection, FVector(50, 50, 50), FColor::Green);
 }

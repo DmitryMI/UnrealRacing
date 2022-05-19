@@ -28,4 +28,6 @@ protected:
 
 	virtual void OnPossess(APawn* pawn) override;
 	virtual void OnUnPossess() override;
+
+	virtual void Tick(float deltaTime) override;
 };

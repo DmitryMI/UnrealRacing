@@ -80,8 +80,15 @@ void AUnrealRacingGameModeBase::CheckStartConditionsAndStartRace()
 	
 	SetupDangerGenerators();
 
-	// Notify all clients that race is starting
-	gameState->StartRace();	
+	if (gameState == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[CheckStartConditionsAndStartRace] Game State is nullptr! Cannot start the race."));
+	}
+	else
+	{
+		// Notify all clients that race is starting
+		gameState->StartRace();
+	}
 
 	// Stop condtion checking timer
 	GetWorldTimerManager().ClearTimer(raceStartConditionTimer);
@@ -128,6 +135,8 @@ void AUnrealRacingGameModeBase::UpdateDangerGenerators()
 
 void AUnrealRacingGameModeBase::Tick(float deltaTime)
 {
+	Super::Tick(deltaTime);
+
 	if (gameState == nullptr)
 	{
 		return;
@@ -220,7 +229,7 @@ APlayerController* AUnrealRacingGameModeBase::Login(UPlayer* NewPlayer, ENetRole
 	}
 	else
 	{
-		ACarPlayerController* carController = Cast< ACarPlayerController>(login_result);
+		ACarPlayerController* carController = Cast<ACarPlayerController>(login_result);
 		if (carController == nullptr)
 		{
 			UE_LOG(LogTemp, Fatal, TEXT("[Login] Player Controller has incompatible type. Player: Options: %s, Address: %s"), *Options, "N/A");

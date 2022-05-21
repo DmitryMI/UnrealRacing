@@ -30,7 +30,14 @@ void ADangerGeneratorBase::BeginPlay()
 	}
 
 	gameMode = GetWorld()->GetAuthGameMode<AUnrealRacingGameModeBase>();
-	gameState = gameMode->GetGameState<AUnrealRacingGameState>();
+	if (gameMode == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Game Mode is not of type AUnrealRacingGameModeBase!"))
+	}
+	else
+	{
+		gameState = gameMode->GetGameState<AUnrealRacingGameState>();
+	}
 }
 
 // Called every frame

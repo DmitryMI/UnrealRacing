@@ -15,12 +15,12 @@ private:
 	UPROPERTY()
 	FVector2D waypoint;
 
-
+	UPawnMovementComponent* movementComponent;
 	
 
 protected:
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	virtual void BeginPlay() override;	
 
 public:	
 	// Sets default values for this pawn's properties
@@ -34,5 +34,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void SetWaypoint(const FVector2D& value);
+
+	UFUNCTION(BlueprintCallable)
+	FVector2D GetLocation2D();
+
+	UFUNCTION(BlueprintCallable)
+	void SetRotation2D(float angle);
 
 };

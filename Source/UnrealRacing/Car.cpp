@@ -2,6 +2,7 @@
 
 
 #include "Car.h"
+#include "GameFramework/PawnMovementComponent.h"
 
 // Sets default values
 ACar::ACar()
@@ -23,6 +24,18 @@ void ACar::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (HasAuthority())
+	{
+		FVector2D location = GetLocation2D();
+
+		FVector2D waypointDirection = waypoint - location;
+
+		DrawDebugLine(GetWorld(), FVector(location.X, 100, location.Y), FVector(waypoint.X, 100, waypoint.Y), FColor::Green);
+
+		float targetAngle = FMath::Atan2(waypointDirection.Y, waypointDirection.X);
+
+		SetRotation2D(targetAngle);
+	}
 }
 
 // Called to bind functionality to input
@@ -35,5 +48,20 @@ void ACar::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void ACar::SetWaypoint(const FVector2D& value)
 {
 	waypoint = value;
+}
+
+FVector2D ACar::GetLocation2D()
+{
+	FVector location = GetActorLocation();
+
+	return FVector2D(location.X, location.Z);
+}
+
+void ACar::SetRotation2D(float angle)
+{
+	//FRotator rotation = FRotator(angle, 0, 0);
+	FRotator rotation = FRotator(FMath::RadiansToDegrees(angle), 0, 0);
+	//FQuat quat = FQuat(0, 1, 0, angle);
+	SetActorRotation(rotation);
 }
 

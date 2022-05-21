@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "DangerGeneratorBase.h"
 #include "CarPlayerController.h"
+#include "MousePlayerController.h"
 #include "GameFramework/PlayerStart.h"
 #include "UnrealRacingGameModeBase.generated.h"
 

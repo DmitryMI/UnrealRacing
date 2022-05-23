@@ -7,6 +7,8 @@
 
 void UCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
 	AActor* owner = GetOwner();
 	ENetRole ownerRole = GetOwnerRole();
 	ENetRole remoteRole = owner->GetRemoteRole();
@@ -38,6 +40,12 @@ void UCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	}
 }
 
+void UCarMovementComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	gameState = GetWorld()->GetGameState<AUnrealRacingGameState>();
+}
+
 float UCarMovementComponent::GetRotation2D() const
 {
 	FQuat rotationQuat = UpdatedComponent->GetRelativeRotation().Quaternion();
@@ -57,7 +65,7 @@ void UCarMovementComponent::CalculateVelocities(float deltaTime, FVector& linear
 	FVector location = UpdatedComponent->GetRelativeLocation();
 	FVector waypoint3d = FVector(waypoint.X, 0, waypoint.Y);
 	FVector waypointDirection = waypoint3d - location;
-	waypointDirection.Y = 0;
+	waypointDirection.Y = 0;	
 
 	float targetAngleRad;
 
@@ -69,15 +77,22 @@ void UCarMovementComponent::CalculateVelocities(float deltaTime, FVector& linear
 	}
 	else
 	{
-		targetAngleRad = FMath::Atan2(waypointDirection.Z, waypointDirection.X);
-
 		float directionLength = waypointDirection.Length();
 		float frameStepMax = maxLinearSpeed * deltaTime;
 		float frameStep = FMath::Clamp(directionLength, 0.0f, frameStepMax);
 		FVector directionNormal = waypointDirection / directionLength;
 
+		FVector faceTarget = FVector(
+			directionNormal.X * maxLinearSpeed,
+			0,
+			directionNormal.Z * maxLinearSpeed + gameState->GetRoadSpeed());
+
+		DrawDebugLine(GetWorld(), location, location + faceTarget, FColor::Green);
+
 		linear = directionNormal * frameStep;
 		linear.Y = 0;
+
+		targetAngleRad = FMath::Atan2(faceTarget.Z, faceTarget.X);
 	}
 
 	DrawDebugLine(GetWorld(), location, waypoint3d, FColor::Green);

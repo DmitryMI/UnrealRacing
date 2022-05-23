@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Interfaces/NetworkPredictionInterface.h"
+#include "UnrealRacingGameState.h"
 #include "CarMovementComponent.generated.h"
 
 /**
@@ -19,6 +20,9 @@ private:
 	UPROPERTY(Transient)
 	FVector2D waypoint;
 
+	UPROPERTY(Transient)
+	AUnrealRacingGameState* gameState;
+
 	UPROPERTY(EditAnywhere)
 	float maxAngularSpeedDeg = 30;
 
@@ -26,6 +30,8 @@ private:
 	float maxLinearSpeed = 800;
 	
 protected:
+	virtual void BeginPlay() override;
+
 	virtual void TickComponent
 	(
 		float DeltaTime,

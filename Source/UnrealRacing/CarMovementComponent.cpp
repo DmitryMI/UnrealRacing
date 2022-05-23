@@ -30,6 +30,10 @@ void UCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 		FHitResult hitResult;
 		SafeMoveUpdatedComponent(linearVelocity, nextRotation, true, hitResult);
+		if (hitResult.Component != nullptr)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Hit!"));
+		}
 	}
 	else if (ownerRole == ROLE_SimulatedProxy)
 	{
@@ -65,11 +69,8 @@ void UCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 			FVector locationInterp = FMath::Lerp(netOldLocation, targetLocation, interpAlpha);
 
-			DrawDebugBox(GetWorld(), locationInterp, FVector(50, 50, 50), FColor::Cyan);
-			DrawDebugBox(GetWorld(), targetLocation, FVector(50, 50, 50), FColor::Blue);
-
-			UE_LOG(LogTemp, Warning, TEXT("Old Location: (%3.2f, %3.2f)"),
-				netOldLocation.X, netOldLocation.Z);
+			//DrawDebugBox(GetWorld(), locationInterp, FVector(50, 50, 50), FColor::Cyan);
+			//DrawDebugBox(GetWorld(), targetLocation, FVector(50, 50, 50), FColor::Blue);
 
 			FQuat currentRotation = UpdatedComponent->GetRelativeRotation().Quaternion();
 			FQuat rotationInterp = FMath::Lerp(netOldRotation, netNewRotation, interpAlpha);
@@ -178,8 +179,8 @@ void UCarMovementComponent::SmoothCorrection(const FVector& OldLocation, const F
 
 	float repPeriod = 1.0f / GetOwner()->NetUpdateFrequency;
 
-	DrawDebugBox(GetWorld(), OldLocation, FVector(50, 50, 50), FColor::Red, false, repPeriod);
-	DrawDebugBox(GetWorld(), NewLocation, FVector(50, 50, 50), FColor::Green, false, repPeriod);
+	//DrawDebugBox(GetWorld(), OldLocation, FVector(50, 50, 50), FColor::Red, false, repPeriod);
+	//DrawDebugBox(GetWorld(), NewLocation, FVector(50, 50, 50), FColor::Green, false, repPeriod);
 
 	timeToNextReplication = 1.0f / GetOwner()->NetUpdateFrequency;
 }

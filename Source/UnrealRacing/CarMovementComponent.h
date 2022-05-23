@@ -39,7 +39,7 @@ private:
 	float networkInterpolationAlphaThreshold = 1.5f;
 
 	UPROPERTY(EditAnywhere)
-	float networkTimeSinceReplicationThreshold = 1.0f;
+	float networkTimeSinceReplicationThreshold = 0.3f;
 
 	FVector netOldLocation;
 	FVector netNewLocation;

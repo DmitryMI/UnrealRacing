@@ -72,7 +72,7 @@ protected:
 	virtual void PostInitializeComponents() override;
 	virtual void Tick(float deltaTime) override;
 
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION()
 	void IsRaceStarted_OnRep();

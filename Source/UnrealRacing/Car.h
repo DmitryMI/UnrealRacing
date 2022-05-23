@@ -7,6 +7,7 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "CarMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "Car.generated.h"
 
 UCLASS()
@@ -19,13 +20,21 @@ private:
 	FVector2D waypoint;
 
 	UPROPERTY(Transient)
-	UCarMovementComponent* movementComponent;	
+	UCarMovementComponent* movementComponent;		
 
-	UCharacterMovementComponent* characterMovement;
+	//UCharacterMovementComponent* characterMovement;
+
+	UPROPERTY(Replicated, ReplicatedUsing = Health_OnRep)
+	float health = 100.0f;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;	
+
+	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	virtual void Health_OnRep();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:	
 	// Sets default values for this pawn's properties

@@ -23,6 +23,16 @@ void ACar::BeginPlay()
 	movementComponent = FindComponentByClass<UCarMovementComponent>();
 }
 
+void ACar::Health_OnRep()
+{
+}
+
+void ACar::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ACar, health);
+}
+
 // Called every frame
 void ACar::Tick(float DeltaTime)
 {

@@ -49,7 +49,7 @@ void UCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			float interpAlpha = timeSinceReplication / replicationPeriod;
 			timeToNextReplication -= DeltaTime;
 
-			interpAlpha = FMath::Clamp(interpAlpha, 0.0f, 1.0f);
+			interpAlpha = FMath::Clamp(interpAlpha, 0.0f, networkInterpolationAlphaThreshold);
 
 			FVector targetLocation;
 			if (networkExtrapolationEnabled)
@@ -74,8 +74,16 @@ void UCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			FQuat currentRotation = UpdatedComponent->GetRelativeRotation().Quaternion();
 			FQuat rotationInterp = FMath::Lerp(netOldRotation, netNewRotation, interpAlpha);
 
-			UpdatedComponent->SetRelativeLocation(locationInterp);
-			UpdatedComponent->SetRelativeRotation(rotationInterp);
+			if (timeSinceReplication < networkTimeSinceReplicationThreshold)
+			{
+				UpdatedComponent->SetRelativeLocation(locationInterp);
+				UpdatedComponent->SetRelativeRotation(rotationInterp);
+			}
+			else
+			{
+				UpdatedComponent->SetRelativeLocation(netNewLocation);
+				UpdatedComponent->SetRelativeRotation(netNewRotation);
+			}
 		}
 	}
 	else

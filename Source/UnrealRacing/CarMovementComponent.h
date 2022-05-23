@@ -35,6 +35,12 @@ private:
 	UPROPERTY(EditAnywhere)
 	bool networkExtrapolationEnabled = true;
 
+	UPROPERTY(EditAnywhere)
+	float networkInterpolationAlphaThreshold = 1.5f;
+
+	UPROPERTY(EditAnywhere)
+	float networkTimeSinceReplicationThreshold = 1.0f;
+
 	FVector netOldLocation;
 	FVector netNewLocation;
 	FQuat netOldRotation;

@@ -82,6 +82,10 @@ void ACarPlayerController::SendWaypoint()
 {
 	FVector2D cursorPos;
 	bool cursorValid = GetCursorPosition(cursorPos);
+	if (!cursorValid)
+	{
+		return;
+	}
 	float mouseX = cursorPos.X;
 	float mouseY = cursorPos.Y;
 
@@ -96,9 +100,9 @@ void ACarPlayerController::SendWaypoint()
 	FVector intersection;
 	UKismetMathLibrary::LinePlaneIntersection(worldPosition, worldPosition + worldDirection, plane, intersectionT, intersection);
 
-	//DrawDebugLine(GetWorld(), worldPosition, intersection, FColor::Green);
+	DrawDebugLine(GetWorld(), worldPosition, intersection, FColor::Green);
 
-	DrawDebugBox(GetWorld(), intersection, FVector(50, 50, 50), FColor::Green);
+	DrawDebugBox(GetWorld(), intersection, FVector(50, 50, 50), FColor::Blue);
 
 	FVector2D waypoint = FVector2D(intersection.X, intersection.Z);
 	possessedCar->SetWaypoint(waypoint);
@@ -108,7 +112,9 @@ void ACarPlayerController::Tick(float deltaTime)
 {
 	Super::Tick(deltaTime);
 
-	if (GetLocalRole() == ROLE_AutonomousProxy)
+	bool isLocalController = IsLocalController();
+
+	if (isLocalController)
 	{
 		APawn* pawn = GetPawn();
 

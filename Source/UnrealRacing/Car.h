@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/FloatingPawnMovement.h"
+#include "CarMovementComponent.h"
 #include "Car.generated.h"
 
 UCLASS()
@@ -15,8 +17,8 @@ private:
 	UPROPERTY()
 	FVector2D waypoint;
 
-	UPawnMovementComponent* movementComponent;
-	
+	UPROPERTY(Transient)
+	UCarMovementComponent* movementComponent;	
 
 protected:
 	// Called when the game starts or when spawned
@@ -32,13 +34,13 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable, Server, Unreliable)
+	virtual void ServerSetWaypoint(const FVector2D& value);
+
 	UFUNCTION(BlueprintCallable)
 	virtual void SetWaypoint(const FVector2D& value);
 
 	UFUNCTION(BlueprintCallable)
 	FVector2D GetLocation2D();
-
-	UFUNCTION(BlueprintCallable)
-	void SetRotation2D(float angle);
 
 };

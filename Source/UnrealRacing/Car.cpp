@@ -10,13 +10,17 @@ ACar::ACar()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//movementComponent = CreateDefaultSubobject<UCarMovementComponent>("CarMovementComponent", true);
+
+
 }
 
 // Called when the game starts or when spawned
 void ACar::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	movementComponent = FindComponentByClass<UCarMovementComponent>();
 }
 
 // Called every frame
@@ -24,17 +28,16 @@ void ACar::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (HasAuthority())
+	bool bIsServer = GetWorld()->GetNetMode() != NM_Client;
+	FString netMode = bIsServer ? "Server" : "Client";
+	FString name;
+	GetName(name);
+
+	if (GetLocalRole() == ROLE_Authority || GetLocalRole() == ROLE_AutonomousProxy)
 	{
-		FVector2D location = GetLocation2D();
-
-		FVector2D waypointDirection = waypoint - location;
-
-		DrawDebugLine(GetWorld(), FVector(location.X, 100, location.Y), FVector(waypoint.X, 100, waypoint.Y), FColor::Green);
-
-		float targetAngle = FMath::Atan2(waypointDirection.Y, waypointDirection.X);
-
-		SetRotation2D(targetAngle);
+		//UE_LOG(LogTemp, Warning, TEXT("[ACar] (%s): Name == %s, Waypoint == (%3.2f, %3.2f)"), *netMode, *name, waypoint.X, waypoint.Y);
+		
+		movementComponent->SetWaypoint(waypoint);
 	}
 }
 
@@ -45,9 +48,15 @@ void ACar::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void ACar::ServerSetWaypoint_Implementation(const FVector2D& value)
+{
+	waypoint = value;
+}
+
 void ACar::SetWaypoint(const FVector2D& value)
 {
 	waypoint = value;
+	ServerSetWaypoint(value);
 }
 
 FVector2D ACar::GetLocation2D()
@@ -55,13 +64,5 @@ FVector2D ACar::GetLocation2D()
 	FVector location = GetActorLocation();
 
 	return FVector2D(location.X, location.Z);
-}
-
-void ACar::SetRotation2D(float angle)
-{
-	//FRotator rotation = FRotator(angle, 0, 0);
-	FRotator rotation = FRotator(FMath::RadiansToDegrees(angle), 0, 0);
-	//FQuat quat = FQuat(0, 1, 0, angle);
-	SetActorRotation(rotation);
 }
 

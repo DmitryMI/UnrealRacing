@@ -25,14 +25,58 @@ void UCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 		currentAngle += angleDeltaRadians;
 		FQuat nextRotation = CalculateQuat2D(currentAngle);
 
-		Velocity = linearVelocity;
+		Velocity = linearVelocity / DeltaTime;
 		UpdateComponentVelocity();
+
 		FHitResult hitResult;
 		SafeMoveUpdatedComponent(linearVelocity, nextRotation, true, hitResult);
 	}
 	else if (ownerRole == ROLE_SimulatedProxy)
 	{
 		// We are owned by remove player or remote server.
+		if (networkSmoothingEnabled)
+		{
+			const FRepMovement& repMovement = GetOwner()->GetReplicatedMovement();			
+
+			float replicationPeriod = 1.0f / GetOwner()->NetUpdateFrequency;
+
+			if (replicationPeriod < DeltaTime)
+			{
+				replicationPeriod = DeltaTime;
+			}
+
+			float timeSinceReplication = (replicationPeriod - timeToNextReplication);
+			float interpAlpha = timeSinceReplication / replicationPeriod;
+			timeToNextReplication -= DeltaTime;
+
+			interpAlpha = FMath::Clamp(interpAlpha, 0.0f, 1.0f);
+
+			FVector targetLocation;
+			if (networkExtrapolationEnabled)
+			{
+				targetLocation = netNewLocation + repMovement.LinearVelocity * replicationPeriod;
+			}
+			else
+			{
+				targetLocation = netNewLocation;
+			}
+
+			FVector currentLocation = UpdatedComponent->GetRelativeLocation();
+
+			FVector locationInterp = FMath::Lerp(netOldLocation, targetLocation, interpAlpha);
+
+			DrawDebugBox(GetWorld(), locationInterp, FVector(50, 50, 50), FColor::Cyan);
+			DrawDebugBox(GetWorld(), targetLocation, FVector(50, 50, 50), FColor::Blue);
+
+			UE_LOG(LogTemp, Warning, TEXT("Old Location: (%3.2f, %3.2f)"),
+				netOldLocation.X, netOldLocation.Z);
+
+			FQuat currentRotation = UpdatedComponent->GetRelativeRotation().Quaternion();
+			FQuat rotationInterp = FMath::Lerp(netOldRotation, netNewRotation, interpAlpha);
+
+			UpdatedComponent->SetRelativeLocation(locationInterp);
+			UpdatedComponent->SetRelativeRotation(rotationInterp);
+		}
 	}
 	else
 	{
@@ -95,8 +139,8 @@ void UCarMovementComponent::CalculateVelocities(float deltaTime, FVector& linear
 		targetAngleRad = FMath::Atan2(faceTarget.Z, faceTarget.X);
 	}
 
-	DrawDebugLine(GetWorld(), location, waypoint3d, FColor::Green);
-	DrawDebugLine(GetWorld(), location, location + UpdatedComponent->GetForwardVector() * 100, FColor::Red);	
+	//DrawDebugLine(GetWorld(), location, waypoint3d, FColor::Green);
+	//DrawDebugLine(GetWorld(), location, location + UpdatedComponent->GetForwardVector() * 100, FColor::Red);	
 
 	float currentAngleRad = GetRotation2D();
 	float rotationDeltaRad = FMath::FindDeltaAngleRadians(currentAngleRad, targetAngleRad);
@@ -119,13 +163,27 @@ bool UCarMovementComponent::ForcePositionUpdate(float DeltaTime)
 
 void UCarMovementComponent::SmoothCorrection(const FVector& OldLocation, const FQuat& OldRotation, const FVector& NewLocation, const FQuat& NewRotation)
 {
-	/*
-	FVector locationInterp = FMath::Lerp(OldLocation, NewLocation, 0.1f);
-	FQuat rotationInterp = FMath::Lerp(OldRotation, NewRotation, 0.1f);
+	netOldLocation = OldLocation;
+	netNewLocation = NewLocation;
+	netOldRotation = OldRotation;
+	netNewRotation = NewRotation;	
 
-	UpdatedComponent->SetRelativeLocation(locationInterp);
-	UpdatedComponent->SetRelativeRotation(rotationInterp);
-	*/
+	float repPeriod = 1.0f / GetOwner()->NetUpdateFrequency;
+
+	DrawDebugBox(GetWorld(), OldLocation, FVector(50, 50, 50), FColor::Red, false, repPeriod);
+	DrawDebugBox(GetWorld(), NewLocation, FVector(50, 50, 50), FColor::Green, false, repPeriod);
+
+	timeToNextReplication = 1.0f / GetOwner()->NetUpdateFrequency;
+}
+
+FNetworkPredictionData_Client* UCarMovementComponent::GetPredictionData_Client() const
+{
+	return nullptr;
+}
+
+FNetworkPredictionData_Server* UCarMovementComponent::GetPredictionData_Server() const
+{
+	return nullptr;
 }
 
 void UCarMovementComponent::SetWaypoint(FVector2D value)
@@ -134,5 +192,23 @@ void UCarMovementComponent::SetWaypoint(FVector2D value)
 }
 
 UCarMovementComponent::UCarMovementComponent()
+{
+}
+
+bool UCarMovementComponent::HasPredictionData_Client() const
+{
+	return false;
+}
+
+bool UCarMovementComponent::HasPredictionData_Server() const
+{
+	return false;
+}
+
+void UCarMovementComponent::ResetPredictionData_Client()
+{
+}
+
+void UCarMovementComponent::ResetPredictionData_Server()
 {
 }

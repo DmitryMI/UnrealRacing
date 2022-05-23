@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "CarMovementComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Car.generated.h"
 
 UCLASS()
@@ -19,6 +20,8 @@ private:
 
 	UPROPERTY(Transient)
 	UCarMovementComponent* movementComponent;	
+
+	UCharacterMovementComponent* characterMovement;
 
 protected:
 	// Called when the game starts or when spawned

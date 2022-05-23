@@ -12,7 +12,7 @@
  * 
  */
 UCLASS(ClassGroup = Movement, meta = (BlueprintSpawnableComponent))
-class UNREALRACING_API UCarMovementComponent : public UMovementComponent, public INetworkPredictionInterface
+class UNREALRACING_API UCarMovementComponent : public UPawnMovementComponent, public INetworkPredictionInterface
 {
 	GENERATED_BODY()
 
@@ -24,10 +24,22 @@ private:
 	AUnrealRacingGameState* gameState;
 
 	UPROPERTY(EditAnywhere)
-	float maxAngularSpeedDeg = 30;
+	float maxAngularSpeedDeg = 360;
 
 	UPROPERTY(EditAnywhere)
 	float maxLinearSpeed = 800;
+
+	UPROPERTY(EditAnywhere)
+	bool networkSmoothingEnabled = true;
+
+	UPROPERTY(EditAnywhere)
+	bool networkExtrapolationEnabled = true;
+
+	FVector netOldLocation;
+	FVector netNewLocation;
+	FQuat netOldRotation;
+	FQuat netNewRotation;
+	float timeToNextReplication = 0;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -53,7 +65,6 @@ protected:
 	/** (Client) After receiving a network update of position, allow some custom smoothing, given the old transform before the correction and new transform from the update. */
 	virtual void SmoothCorrection(const FVector& OldLocation, const FQuat& OldRotation, const FVector& NewLocation, const FQuat& NewRotation) override;
 
-	/*
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
 
 	virtual class FNetworkPredictionData_Server* GetPredictionData_Server() const override;
@@ -65,7 +76,7 @@ protected:
 	virtual void ResetPredictionData_Client()  override;
 
 	virtual void ResetPredictionData_Server() override;
-	*/
+	
 
 public:
 	void SetWaypoint(FVector2D value);

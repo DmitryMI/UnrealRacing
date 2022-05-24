@@ -62,28 +62,8 @@ void ARandomDangerGenerator::SpawnLineOfObstacles()
 		int randSlot = FMath::FRandRange(-maxSlots / 2, maxSlots / 2);
 		float x = randSlot * obstacleWidth;
 		auto obstacleType = GetRandomObstacleType();
-		obstacle = SpawnObstacle(x, roadTopZ, obstacleType);
+		obstacle = Cast<AObstacle>(SpawnObstacle(x, roadTopZ, obstacleType));
 	}
-}
-
-AObstacle* ARandomDangerGenerator::SpawnObstacle(float x, float y, TSubclassOf<AObstacle> obstacleType)
-{
-	FVector location = FVector(x, 10, y);
-	FActorSpawnParameters spawnParams;
-	AObstacle* spawnedActor = GetWorld()->SpawnActor<AObstacle>(obstacleType, location, FRotator(), spawnParams);
-	if (spawnedActor != nullptr)
-	{
-#if WITH_EDITOR
-		spawnedActor->SetFolderPath("/LevelObjects/Obstacles");
-#endif
-		UE_LOG(LogTemp, VeryVerbose, TEXT("Spawned obstacle on (%3.2f, %3.2f)"), x, y);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to spawn obstacle on (%3.2f, %3.2f)"), x, y);
-	}
-
-	return spawnedActor;
 }
 
 void ARandomDangerGenerator::Tick(float deltaTime)

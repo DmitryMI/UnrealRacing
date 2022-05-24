@@ -35,6 +35,8 @@ protected:
 	}
 
 	float GetTravelledDistance();
+
+	AActor* SpawnObstacle(float x, float y, TSubclassOf<AActor> obstacleType);
 	
 public:
 	// Sets default values for this actor's properties

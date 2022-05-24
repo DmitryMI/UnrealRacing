@@ -10,6 +10,8 @@ AObstacle::AObstacle()
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 	//SetReplicateMovement(true);
+
+	movementComponent = CreateDefaultSubobject<UObstacleMovementComponent>(TEXT("MovementComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -34,11 +36,6 @@ void AObstacle::BeginPlay()
 void AObstacle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	FVector location = GetActorLocation();
-
-	location += FVector::DownVector * gameState->GetRoadSpeed() * DeltaTime;
-
-	SetActorLocation(location);
+	
 }
 

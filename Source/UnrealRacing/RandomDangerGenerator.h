@@ -47,8 +47,6 @@ private:
 
 	void SpawnLineOfObstacles();
 
-	AObstacle* SpawnObstacle(float x, float y, TSubclassOf<AObstacle> obstacleType);
-
 protected:
 	virtual void Tick(float deltaTime) override;
 	

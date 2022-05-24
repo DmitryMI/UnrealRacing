@@ -8,6 +8,8 @@
 #include "UnrealRacingGameState.h"
 #include "CarMovementComponent.generated.h"
 
+class UObstacleMovementComponent;
+
 /**
  * 
  */
@@ -61,6 +63,7 @@ protected:
 	FQuat CalculateQuat2D(float angleRad) const;
 
 	void CalculateVelocities(float deltaTime, FVector& linear, float& angularRad) const;
+	virtual void HandleImpact(const FHitResult& Hit, float TimeSlice = 0.f, const FVector& MoveDelta = FVector::ZeroVector) override;
 
 	// INetworkPredictionInterface
 	virtual void SendClientAdjustment() override;
@@ -88,4 +91,6 @@ public:
 	void SetWaypoint(FVector2D value);
 
 	UCarMovementComponent();
+
+	bool OnObstacleImpact(UObstacleMovementComponent* obstacleMovement, const FHitResult& Hit, float TimeSlice, const FVector& MoveDelta);
 };

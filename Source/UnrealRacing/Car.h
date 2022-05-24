@@ -24,6 +24,8 @@ private:
 
 	//UCharacterMovementComponent* characterMovement;
 
+	UFloatingPawnMovement* floatingMovement;
+
 	UPROPERTY(Replicated, ReplicatedUsing = Health_OnRep)
 	float health = 100.0f;
 

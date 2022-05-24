@@ -3,6 +3,7 @@
 
 #include "CarMovementComponent.h"
 #include "DrawDebugHelpers.h"
+#include "ObstacleMovementComponent.h"
 #include "GameFramework/HUD.h"
 
 void UCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -30,9 +31,13 @@ void UCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 		FHitResult hitResult;
 		SafeMoveUpdatedComponent(linearVelocity, nextRotation, true, hitResult);
-		if (hitResult.Component != nullptr)
-		{
-			UE_LOG(LogTemp, Error, TEXT("Hit!"));
+		//MoveUpdatedComponent(linearVelocity, nextRotation, true, &hitResult);
+
+		if (hitResult.IsValidBlockingHit())
+		{			
+			HandleImpact(hitResult, DeltaTime, linearVelocity);
+			// Try to slide the remaining distance along the surface.
+			//SlideAlongSurface(linearVelocity, 1.f - hitResult.Time, hitResult.Normal, hitResult, true);
 		}
 	}
 	else if (ownerRole == ROLE_SimulatedProxy)
@@ -161,6 +166,30 @@ void UCarMovementComponent::CalculateVelocities(float deltaTime, FVector& linear
 	//UE_LOG(LogTemp, Warning, TEXT("Current Angle: %3.2f, Target Angle: %3.2f, Delta: %3.2f, Velocity: %3.2f"), currentAngleDeg, targetAngleDeg, rotationDeltaDeg, angularDeg);
 }
 
+void UCarMovementComponent::HandleImpact(const FHitResult& Hit, float TimeSlice, const FVector& MoveDelta)
+{
+	UE_LOG(LogTemp, Error, TEXT("Car Movement Hit!"));
+	Velocity = Hit.Normal * MoveDelta;
+	UpdatedComponent->AddRelativeLocation(Velocity * TimeSlice);
+	UpdateComponentVelocity();
+}
+
+bool UCarMovementComponent::OnObstacleImpact(UObstacleMovementComponent* obstacleMovement, const FHitResult& Hit, float TimeSlice, const FVector& MoveDelta)
+{
+	FVector knockBack = MoveDelta * Hit.Normal.Dot(MoveDelta.GetSafeNormal());
+	//UpdatedComponent->AddRelativeLocation(knockBack);
+
+	
+	bool movementSucceeded = MoveUpdatedComponent(MoveDelta, UpdatedComponent->GetRelativeRotation().Quaternion(), false);
+	if (movementSucceeded)
+	{
+		Velocity = knockBack / TimeSlice;
+		UpdateComponentVelocity();
+	}
+
+	return movementSucceeded;
+}
+
 void UCarMovementComponent::SendClientAdjustment()
 {
 }
@@ -203,6 +232,7 @@ void UCarMovementComponent::SetWaypoint(FVector2D value)
 UCarMovementComponent::UCarMovementComponent()
 {
 }
+
 
 bool UCarMovementComponent::HasPredictionData_Client() const
 {

@@ -40,6 +40,26 @@ void ADangerGeneratorBase::BeginPlay()
 	}
 }
 
+AActor* ADangerGeneratorBase::SpawnObstacle(float x, float y, TSubclassOf<AActor> obstacleType)
+{
+	FVector location = FVector(x, 10, y);
+	FActorSpawnParameters spawnParams;
+	AActor* spawnedActor = GetWorld()->SpawnActor<AActor>(obstacleType, location, FRotator(), spawnParams);
+	if (spawnedActor != nullptr)
+	{
+#if WITH_EDITOR
+		spawnedActor->SetFolderPath("/LevelObjects/Obstacles");
+#endif
+		UE_LOG(LogTemp, VeryVerbose, TEXT("Spawned obstacle on (%3.2f, %3.2f)"), x, y);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to spawn obstacle on (%3.2f, %3.2f)"), x, y);
+	}
+
+	return spawnedActor;
+}
+
 // Called every frame
 void ADangerGeneratorBase::Tick(float DeltaTime)
 {

@@ -55,12 +55,25 @@ void ARandomDangerGenerator::SpawnLineOfObstacles()
 
 	int maxSlots = roadWidth / obstacleWidth;
 
+	TArray<int> occupiedSlots;
+
 	for (int i = 0; i < number; i++)
 	{
+		if (occupiedSlots.Num() == maxSlots)
+		{
+			break;
+		}
+
 		AObstacle* obstacle = nullptr;
-		
-		int randSlot = FMath::FRandRange(-maxSlots / 2, maxSlots / 2);
-		float x = randSlot * obstacleWidth;
+		int randSlot;
+		do
+		{
+			randSlot = FMath::FRandRange(0, maxSlots);
+		} while (occupiedSlots.Contains(randSlot));
+
+		occupiedSlots.Add(randSlot);
+
+		float x = (randSlot - maxSlots / 2.0f) * obstacleWidth;
 		auto obstacleType = GetRandomObstacleType();
 		obstacle = Cast<AObstacle>(SpawnObstacle(x, roadTopZ, obstacleType));
 	}
@@ -68,7 +81,7 @@ void ARandomDangerGenerator::SpawnLineOfObstacles()
 
 void ARandomDangerGenerator::Tick(float deltaTime)
 {
-	if (bIsActive)
+	if (bIsActive && IsGeneratorEnabled())
 	{
 		float lineDistance = ScaleWithDifficultyLinear(distanceBetweenLinesMax, distanceBetweenLinesMin);
 

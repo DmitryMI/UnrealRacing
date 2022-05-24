@@ -19,6 +19,9 @@ private:
 	
 protected:	
 
+	UPROPERTY(EditAnywhere)
+	bool bIsGeneratorEnabled = true;
+
 	AUnrealRacingGameModeBase* gameMode;
 	AUnrealRacingGameState* gameState;
 
@@ -49,6 +52,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsGeneratorActive();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsGeneratorEnabled();
+
+	UFUNCTION(BlueprintCallable)
+	void SetGeneratorEnabled(bool isEnabled);
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool CanDeactivateNow();

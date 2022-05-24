@@ -5,7 +5,10 @@
 
 void ASingleObstacleGenerator::ActivateGenerator()
 {
-	FVector2D roadCenter = gameState->GetRoadCenter();
-	float roadZ = gameState->GetRoadTopZ();
-	SpawnObstacle(roadCenter.X, roadZ, ObstacleType);
+	if (IsGeneratorEnabled())
+	{
+		FVector2D roadCenter = gameState->GetRoadCenter();
+		float roadZ = gameState->GetRoadTopZ();
+		SpawnObstacle(roadCenter.X, roadZ, ObstacleType);
+	}
 }

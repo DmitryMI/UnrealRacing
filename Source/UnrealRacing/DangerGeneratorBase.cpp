@@ -44,6 +44,7 @@ AActor* ADangerGeneratorBase::SpawnObstacle(float x, float y, TSubclassOf<AActor
 {
 	FVector location = FVector(x, 10, y);
 	FActorSpawnParameters spawnParams;
+	spawnParams.bNoFail = false;
 	AActor* spawnedActor = GetWorld()->SpawnActor<AActor>(obstacleType, location, FRotator(), spawnParams);
 	if (spawnedActor != nullptr)
 	{
@@ -80,6 +81,16 @@ void ADangerGeneratorBase::DeactivateGenerator()
 bool ADangerGeneratorBase::IsGeneratorActive()
 {
 	return bIsActive;
+}
+
+bool ADangerGeneratorBase::IsGeneratorEnabled()
+{
+	return bIsGeneratorEnabled;
+}
+
+void ADangerGeneratorBase::SetGeneratorEnabled(bool isEnabled)
+{
+	bIsGeneratorEnabled = isEnabled;
 }
 
 bool ADangerGeneratorBase::CanDeactivateNow()

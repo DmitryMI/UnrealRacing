@@ -101,36 +101,58 @@ void AUnrealRacingGameModeBase::CheckStartConditionsAndStartRace()
 
 void AUnrealRacingGameModeBase::UpdateDangerGenerators()
 {
-	float activityTime = FMath::RandRange(generatorMinTime, generatorMaxTime);
-	int nextIndex = FMath::RandRange(0, dangerGenerators.Num() - 1);
-	ADangerGeneratorBase* next = dangerGenerators[nextIndex];
-	if (next == activeGenerator)
+	bool hasEnabledGenerators = false;
+	for (auto generator : dangerGenerators)
 	{
-		// Same generator, nothing to do
-		FString name;
-		activeGenerator->GetName(name);
-		UE_LOG(LogTemp, Display, TEXT("Prolonging generator %s for %3.2f"), *name, activityTime);
-	}
-	else if(activeGenerator != nullptr && activeGenerator->CanDeactivateNow())
-	{
-		activeGenerator->DeactivateGenerator();
-		activeGenerator = next;
-		activeGenerator->ActivateGenerator();
-
-		FString name;
-		activeGenerator->GetName(name);
-		UE_LOG(LogTemp, Display, TEXT("Activating generator %s for %3.2f"), *name, activityTime);
-	}	
-	else if (activeGenerator == nullptr)
-	{
-		activeGenerator = next;
-		FString name;
-		activeGenerator->ActivateGenerator();
-		activeGenerator->GetName(name);
-		UE_LOG(LogTemp, Display, TEXT("First generator is %s for %3.2f"), *name, activityTime);
+		if (generator->IsGeneratorEnabled())
+		{
+			hasEnabledGenerators = true;
+			break;
+		}
 	}
 
-	GetWorldTimerManager().SetTimer(dangerGeneratorUpdateTimer, this, &AUnrealRacingGameModeBase::UpdateDangerGenerators, 0, false, activityTime);
+	if (hasEnabledGenerators)
+	{
+		float activityTime = FMath::RandRange(generatorMinTime, generatorMaxTime);
+		ADangerGeneratorBase* next = nullptr;
+		while (next == nullptr || !next->IsGeneratorEnabled())
+		{
+			int nextIndex = FMath::RandRange(0, dangerGenerators.Num() - 1);
+			next = dangerGenerators[nextIndex];
+		}
+
+		if (next == activeGenerator)
+		{
+			// Same generator, nothing to do
+			FString name;
+			activeGenerator->GetName(name);
+			UE_LOG(LogTemp, Display, TEXT("Prolonging generator %s for %3.2f"), *name, activityTime);
+		}
+		else if (activeGenerator != nullptr && activeGenerator->CanDeactivateNow())
+		{
+			activeGenerator->DeactivateGenerator();
+			activeGenerator = next;
+			activeGenerator->ActivateGenerator();
+
+			FString name;
+			activeGenerator->GetName(name);
+			UE_LOG(LogTemp, Display, TEXT("Activating generator %s for %3.2f"), *name, activityTime);
+		}
+		else if (activeGenerator == nullptr)
+		{
+			activeGenerator = next;
+			FString name;
+			activeGenerator->ActivateGenerator();
+			activeGenerator->GetName(name);
+			UE_LOG(LogTemp, Display, TEXT("First generator is %s for %3.2f"), *name, activityTime);
+		}
+
+		GetWorldTimerManager().SetTimer(dangerGeneratorUpdateTimer, this, &AUnrealRacingGameModeBase::UpdateDangerGenerators, 0.0f, false, activityTime);
+	}
+	else
+	{
+		GetWorldTimerManager().SetTimer(dangerGeneratorUpdateTimer, this, &AUnrealRacingGameModeBase::UpdateDangerGenerators, 0.0f, false, 1.0f);
+	}
 }
 
 void AUnrealRacingGameModeBase::Tick(float deltaTime)

@@ -49,7 +49,6 @@ void UObstacleMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 		}
 		else if(!bMoved)
 		{
-			/*
 			AActor* myOwner = GetOwner();
 			AActor* otherOwner = hitResult.GetComponent()->GetOwner();
 
@@ -60,14 +59,13 @@ void UObstacleMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 			FVector myLocation = UpdatedComponent->GetRelativeLocation();
 			FVector otherLocation = hitResult.GetComponent()->GetRelativeLocation();
-			
+
 			UE_LOG(LogTemp, Error, TEXT("Unhandled penetration: Me: %s (%3.2f, %3.2f, %3.2f), They: %s (%3.2f, %3.2f, %3.2f)"), 
 				*myName,
 				myLocation.X, myLocation.Y, myLocation.Z,
 				*otherName,
 				otherLocation.X, otherLocation.Y, otherLocation.Z
 			);
-			*/
 		}
 	}
 
@@ -75,7 +73,7 @@ void UObstacleMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	FVector realDelta = nextLocation - oldLocation;
 	if (realDelta != Delta)
 	{
-		//UE_LOG(LogTemp, Error, TEXT("Obstacle Movement: wrong delta!"));
+		UE_LOG(LogTemp, Error, TEXT("Obstacle Movement: wrong delta!"));
 	}
 
 	UpdateComponentVelocity();

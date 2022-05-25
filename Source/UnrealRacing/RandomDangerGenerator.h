@@ -30,7 +30,7 @@ private:
 	float distanceBetweenLinesMax = 300;
 
 	UPROPERTY(EditDefaultsOnly)
-	float obstacleWidth = 50;
+	float obstacleWidth = 90;
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSubclassOf<AObstacle>> ObstacleTypes;

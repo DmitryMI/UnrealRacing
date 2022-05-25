@@ -17,6 +17,9 @@ class UNREALRACING_API UObstacleMovementComponent : public UMovementComponent
 private:
 	UPROPERTY(Transient)
 	AUnrealRacingGameState* gameState;
+
+	bool bDoRetryMovement;
+
 protected:
 	virtual void BeginPlay() override;
 

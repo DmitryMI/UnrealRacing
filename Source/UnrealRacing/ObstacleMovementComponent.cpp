@@ -2,6 +2,7 @@
 
 
 #include "ObstacleMovementComponent.h"
+#include "Obstacle.h"
 #include "Car.h"
 
 void UObstacleMovementComponent::BeginPlay()
@@ -41,15 +42,17 @@ void UObstacleMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 		if (hitResult.IsValidBlockingHit())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Obstacle Movement Hit!"));
-			HandleImpact(hitResult, DeltaTime, Delta);
-			bMoved = false;
+			HandleImpact(hitResult, DeltaTime, Delta);			
 
 			// Reset movement, we need all-or-nothing
-			UpdatedComponent->SetRelativeLocation(location, false);
+			if (bDoRetryMovement)
+			{
+				bMoved = false;
+				UpdatedComponent->SetRelativeLocation(location, false);
+			}
 		}
 		else if(!bMoved)
-		{
-			/*
+		{			
 			AActor* myOwner = GetOwner();
 			AActor* otherOwner = hitResult.GetComponent()->GetOwner();
 
@@ -67,7 +70,7 @@ void UObstacleMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 				*otherName,
 				otherLocation.X, otherLocation.Y, otherLocation.Z
 			);
-			*/
+			
 		}
 	}
 
@@ -113,17 +116,25 @@ bool UObstacleMovementComponent::ResolvePenetrationImpl(const FVector& ProposedA
 void UObstacleMovementComponent::HandleImpact(const FHitResult& Hit, float TimeSlice, const FVector& MoveDelta)
 {
 	ACar* car = Cast<ACar>(Hit.GetActor());
-
-	if (car == nullptr)
+	AObstacle* obstacle = Cast<AObstacle>(Hit.GetActor());
+	if (obstacle != nullptr)
 	{
+		// If we hit another obstacle, then just move forward without sweep
+		MoveUpdatedComponent(MoveDelta, UpdatedComponent->GetRelativeRotation(), false);
+		bDoRetryMovement = false;
 		return;
 	}
-
-	// If we hit a car, continue movement and shift the car
-
-	UCarMovementComponent* carMovement = Cast<UCarMovementComponent>(car->GetMovementComponent());
-	if (carMovement != nullptr)
+	
+	if (car != nullptr)
 	{
-		carMovement->OnObstacleImpact(this, Hit, TimeSlice, MoveDelta);
+		// If we hit a car, continue movement and shift the car		
+		bDoRetryMovement = false;
+		UCarMovementComponent* carMovement = Cast<UCarMovementComponent>(car->GetMovementComponent());
+		if (carMovement != nullptr)
+		{
+			carMovement->OnObstacleImpact(this, Hit, TimeSlice, MoveDelta);
+			bDoRetryMovement = true;
+		}
+		return;
 	}
 }

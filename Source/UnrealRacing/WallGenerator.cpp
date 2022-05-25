@@ -3,9 +3,9 @@
 
 #include "WallGenerator.h"
 
-void AWallGenerator::ActivateGenerator()
+void AWallGenerator::ActivateGeneratorInternal()
 {
-	Super::ActivateGenerator();
+	Super::ActivateGeneratorInternal();
 	lastLineDistance = 0;
 }
 

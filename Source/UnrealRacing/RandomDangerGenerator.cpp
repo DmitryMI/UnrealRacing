@@ -3,9 +3,9 @@
 
 #include "RandomDangerGenerator.h"
 
-void ARandomDangerGenerator::ActivateGenerator()
+void ARandomDangerGenerator::ActivateGeneratorInternal()
 {
-	Super::ActivateGenerator();
+	Super::ActivateGeneratorInternal();
 	lastLineDistance = 0;
 }
 
@@ -74,8 +74,12 @@ void ARandomDangerGenerator::SpawnLineOfObstacles()
 		occupiedSlots.Add(randSlot);
 
 		float x = (randSlot - maxSlots / 2.0f) * obstacleWidth;
+
+		float lineDistance = ScaleWithDifficultyLinear(distanceBetweenLinesMax, distanceBetweenLinesMin);
+
+		float y = FMath::RandRange(roadTopZ - lineDistance / 2.0f, roadTopZ + lineDistance / 2.0f);
 		auto obstacleType = GetRandomObstacleType();
-		obstacle = Cast<AObstacle>(SpawnObstacle(x, roadTopZ, obstacleType));
+		obstacle = Cast<AObstacle>(SpawnObstacle(x, y, obstacleType));
 	}
 }
 

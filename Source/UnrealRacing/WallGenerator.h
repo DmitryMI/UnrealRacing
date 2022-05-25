@@ -49,9 +49,9 @@ class UNREALRACING_API AWallGenerator : public ADangerGeneratorBase
 protected:
 	virtual void Tick(float deltaTime) override;
 
-public:
-	virtual void ActivateGenerator() override;
+	virtual void ActivateGeneratorInternal() override;
 
+public:
 	virtual void DeactivateGenerator() override;
 
 	virtual bool CanDeactivateNow() override;

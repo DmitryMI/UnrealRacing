@@ -49,10 +49,11 @@ private:
 
 protected:
 	virtual void Tick(float deltaTime) override;
+
+	virtual void ActivateGeneratorInternal() override;
 	
 public:
-	virtual void ActivateGenerator() override;
-
+	
 	virtual void DeactivateGenerator() override;
 
 	virtual bool CanDeactivateNow() override;

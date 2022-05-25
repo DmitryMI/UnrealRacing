@@ -16,6 +16,8 @@ class UNREALRACING_API ASingleObstacleGenerator : public ADangerGeneratorBase
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActor> ObstacleType;
+
+	virtual void ActivateGeneratorInternal() override;
 public:
-	virtual void ActivateGenerator();
+	
 };

@@ -9,6 +9,21 @@ float ADangerGeneratorBase::GetTravelledDistance()
 	return gameState->GetTravelledDistance();
 }
 
+void ADangerGeneratorBase::StartDistanceMeasuring()
+{
+	measureDistanceStart = GetTravelledDistance();
+}
+
+float ADangerGeneratorBase::GetMeasuredDistance()
+{
+	return gameState->GetTravelledDistance() - measureDistanceStart;
+}
+
+float ADangerGeneratorBase::GetZFromTravelledDistance(float distance)
+{
+	return GetTravelledDistance() + distance;
+}
+
 // Sets default values
 ADangerGeneratorBase::ADangerGeneratorBase()
 {
@@ -61,6 +76,11 @@ AActor* ADangerGeneratorBase::SpawnObstacle(float x, float y, TSubclassOf<AActor
 	return spawnedActor;
 }
 
+void ADangerGeneratorBase::ActivateGeneratorInternal()
+{
+	bIsActive = true;
+}
+
 // Called every frame
 void ADangerGeneratorBase::Tick(float DeltaTime)
 {
@@ -70,7 +90,27 @@ void ADangerGeneratorBase::Tick(float DeltaTime)
 
 void ADangerGeneratorBase::ActivateGenerator()
 {
-	bIsActive = true;
+	if (activationDelaySeconds < 0.01f)
+	{
+		ActivateGeneratorInternal();
+	}
+	else
+	{
+		GetWorldTimerManager().SetTimer(activationDelayTimerHandle, this, &ADangerGeneratorBase::ActivateGeneratorInternal, activationDelaySeconds, false, activationDelaySeconds);
+	}
+}
+
+void ADangerGeneratorBase::ActivateGeneratorDeferred(float delay)
+{
+	float totalDelay = delay + activationDelaySeconds;
+	if (totalDelay < 0.01f)
+	{
+		ActivateGeneratorInternal();
+	}
+	else
+	{
+		GetWorldTimerManager().SetTimer(activationDelayTimerHandle, this, &ADangerGeneratorBase::ActivateGeneratorInternal, totalDelay, false, totalDelay);
+	}
 }
 
 void ADangerGeneratorBase::DeactivateGenerator()

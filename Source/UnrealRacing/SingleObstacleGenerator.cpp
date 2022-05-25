@@ -3,7 +3,7 @@
 
 #include "SingleObstacleGenerator.h"
 
-void ASingleObstacleGenerator::ActivateGenerator()
+void ASingleObstacleGenerator::ActivateGeneratorInternal()
 {
 	if (IsGeneratorEnabled())
 	{

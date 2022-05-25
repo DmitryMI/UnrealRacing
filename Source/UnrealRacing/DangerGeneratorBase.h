@@ -16,14 +16,20 @@ class UNREALRACING_API ADangerGeneratorBase : public AActor
 	GENERATED_BODY()
 	
 private:	
+
+	float measureDistanceStart;
 	
 protected:	
 
 	UPROPERTY(EditAnywhere)
 	bool bIsGeneratorEnabled = true;
 
+	UPROPERTY(EditAnywhere)
+	float activationDelaySeconds = 2.0f;
+
 	AUnrealRacingGameModeBase* gameMode;
 	AUnrealRacingGameState* gameState;
+	FTimerHandle activationDelayTimerHandle;
 
 	bool bIsActive = false;
 
@@ -39,14 +45,26 @@ protected:
 
 	float GetTravelledDistance();
 
+	void StartDistanceMeasuring();
+
+	float GetMeasuredDistance();
+
+	float GetZFromTravelledDistance(float distance);
+
 	AActor* SpawnObstacle(float x, float y, TSubclassOf<AActor> obstacleType);
+
+	virtual void ActivateGeneratorInternal();
 	
 public:
 	// Sets default values for this actor's properties
 	ADangerGeneratorBase();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void ActivateGenerator();
+	void ActivateGenerator();
+
+	UFUNCTION(BlueprintCallable)
+	void ActivateGeneratorDeferred(float delay);
+
 	UFUNCTION(BlueprintCallable)
 	virtual void DeactivateGenerator();
 

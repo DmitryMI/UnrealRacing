@@ -101,6 +101,8 @@ void AUnrealRacingGameModeBase::CheckStartConditionsAndStartRace()
 
 void AUnrealRacingGameModeBase::UpdateDangerGenerators()
 {
+	UE_LOG(LogTemp, Warning, TEXT("UpdateDangerGenerators()"));
+
 	bool hasEnabledGenerators = false;
 	for (auto generator : dangerGenerators)
 	{
@@ -126,7 +128,7 @@ void AUnrealRacingGameModeBase::UpdateDangerGenerators()
 			// Same generator, nothing to do
 			FString name;
 			activeGenerator->GetName(name);
-			UE_LOG(LogTemp, Display, TEXT("Prolonging generator %s for %3.2f"), *name, activityTime);
+			UE_LOG(LogTemp, Warning, TEXT("Prolonging generator %s for %3.2f"), *name, activityTime);
 		}
 		else if (activeGenerator != nullptr && activeGenerator->CanDeactivateNow())
 		{
@@ -136,7 +138,7 @@ void AUnrealRacingGameModeBase::UpdateDangerGenerators()
 
 			FString name;
 			activeGenerator->GetName(name);
-			UE_LOG(LogTemp, Display, TEXT("Activating generator %s for %3.2f"), *name, activityTime);
+			UE_LOG(LogTemp, Warning, TEXT("Activating generator %s for %3.2f"), *name, activityTime);
 		}
 		else if (activeGenerator == nullptr)
 		{
@@ -144,14 +146,14 @@ void AUnrealRacingGameModeBase::UpdateDangerGenerators()
 			FString name;
 			activeGenerator->ActivateGenerator();
 			activeGenerator->GetName(name);
-			UE_LOG(LogTemp, Display, TEXT("First generator is %s for %3.2f"), *name, activityTime);
+			UE_LOG(LogTemp, Warning, TEXT("First generator is %s for %3.2f"), *name, activityTime);
 		}
 
-		GetWorldTimerManager().SetTimer(dangerGeneratorUpdateTimer, this, &AUnrealRacingGameModeBase::UpdateDangerGenerators, 0.0f, false, activityTime);
+		GetWorldTimerManager().SetTimer(dangerGeneratorUpdateTimer, this, &AUnrealRacingGameModeBase::UpdateDangerGenerators, activityTime, false, activityTime);
 	}
 	else
 	{
-		GetWorldTimerManager().SetTimer(dangerGeneratorUpdateTimer, this, &AUnrealRacingGameModeBase::UpdateDangerGenerators, 0.0f, false, 1.0f);
+		GetWorldTimerManager().SetTimer(dangerGeneratorUpdateTimer, this, &AUnrealRacingGameModeBase::UpdateDangerGenerators, 1.0f, false, 1.0f);
 	}
 }
 

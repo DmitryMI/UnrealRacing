@@ -38,7 +38,7 @@ void AZigzagGenerator::SpawnSegment()
 
 	float clearZoneSize = (1.0f - directionDot) * GetGateWidth() / 2.0f + obstacleSize.Y;
 
-	if (fromPreviousPivot < clearZoneSize)
+	if (fromPreviousPivot < clearZoneSize || toNextPivot < clearZoneSize)
 	{
 		return;
 	}

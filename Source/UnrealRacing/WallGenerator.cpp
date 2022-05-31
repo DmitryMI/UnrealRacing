@@ -67,7 +67,7 @@ void AWallGenerator::SpawnWallOfObstacles()
 	int gateEnd = gateStart + gateWidth - 1;
 
 	int leftWallSlots = gateStart + 1;
-	int rightWallSlots = maxSlots - gateEnd + 1;
+	int rightWallSlots = maxSlots - gateEnd + 2;
 
 	float debugDrawTime = 1.0f;
 

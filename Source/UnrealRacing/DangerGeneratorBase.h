@@ -25,7 +25,7 @@ protected:
 	bool bIsGeneratorEnabled = true;
 
 	UPROPERTY(EditAnywhere)
-	float activationDelaySeconds = 2.0f;
+	float activationDelaySeconds = 1.0f;
 
 	AUnrealRacingGameModeBase* gameMode;
 	AUnrealRacingGameState* gameState;
